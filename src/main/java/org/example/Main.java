@@ -34,7 +34,8 @@ import org.json.JSONObject;
 public class Main {
     Logger logger = LoggerFactory.getLogger(Main.class);
     public static final int ChunkSize = 512 * 1024;
-    public static final String baseURL = "http://nft.skymeta.pro";
+    public static final String baseURL = "http://nft.skymeta.pro/game_api";
+//    public static final String baseURL = "http://127.0.0.1:9090";
 
     public static String getMd5(byte[] data) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -137,20 +138,28 @@ public class Main {
         StringBody hashTags = new StringBody(new Gson().toJson(new String[]{"hash tag 1 ", "hash tag 2", "hash tag 3"}), ContentType.TEXT_PLAIN);
         StringBody topics = new StringBody(new Gson().toJson(new String[]{"topics 1", "topics 2", "topics 3"}), ContentType.TEXT_PLAIN);
 
+        StringBody deviceId = new StringBody("111111AAAAAAAAA", ContentType.TEXT_PLAIN);
+        StringBody score = new StringBody("88888", ContentType.TEXT_PLAIN);
+        StringBody userId = new StringBody("1", ContentType.TEXT_PLAIN);
+        StringBody gameId = new StringBody("ban_ga", ContentType.TEXT_PLAIN);
 
         HttpEntity reqEntity = MultipartEntityBuilder.create()
                 .addPart("title", title)
-                .addPart("description", description)
                 .addPart("description", description)
                 .addPart("hash_tags", hashTags)
                 .addPart("topics", topics)
                 .addBinaryBody("cover", cover)
                 .addBinaryBody("video", video)
+                .addPart("device_id", deviceId)
+                .addPart("score", score)
+                .addPart("user_id", userId)
+                .addPart("game_id", gameId)
                 .build();
         httppost.setEntity(reqEntity);
 
         CloseableHttpResponse response = client.execute(httppost);
         String json = CharStreams.toString(new InputStreamReader(response.getEntity().getContent()));
+        System.out.println(json);
         client.close();
         HttpResponse dataResponse = new Gson().fromJson(json, HttpResponse.class);
         System.out.println(dataResponse.Code);
@@ -162,6 +171,40 @@ public class Main {
         dataResponse.Data = new Gson().fromJson(dataString, dataResponse.Data.getClass());
 
         System.out.println(dataResponse.Data);
+    }
+
+
+    public static void signUpNewUserMultipart() throws Exception {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost(baseURL + "/users/signup/multipart");
+
+        String avatarFile = "/home/tamnb/Pictures/avatar.png";
+
+
+        StringBody name = new StringBody("Alex", ContentType.TEXT_PLAIN);
+        StringBody pushToken = new StringBody("0x1saeaeaeANADASDASDAd0x", ContentType.TEXT_PLAIN);
+        StringBody deviceId = new StringBody("222222BBBBBB", ContentType.TEXT_PLAIN);
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create()
+                .addPart("name", name)
+                .addPart("push_token", pushToken)
+                .addPart("device_id", deviceId);
+        if (avatarFile.length() > 0) {
+            File avatar = new File(avatarFile);
+            builder = builder.addBinaryBody("avatar", avatar);
+        }
+        HttpEntity reqEntity = builder.build();
+
+
+        httppost.setEntity(reqEntity);
+
+        CloseableHttpResponse response = client.execute(httppost);
+        String json = CharStreams.toString(new InputStreamReader(response.getEntity().getContent()));
+        System.out.println(json);
+        client.close();
+        HttpResponse dataResponse = new Gson().fromJson(json, HttpResponse.class);
+        System.out.println(dataResponse.Code);
+        System.out.println(dataResponse.Msg);
     }
 
     public static void SplittingFileAndUpload() throws Exception {
@@ -214,7 +257,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Hello world!");
-
+//        signUpNewUserMultipart();
         UploadMultipartFile();
         //SplittingFileAndUpload();
 
