@@ -34,8 +34,8 @@ import org.json.JSONObject;
 public class Main {
     Logger logger = LoggerFactory.getLogger(Main.class);
     public static final int ChunkSize = 512 * 1024;
-    public static final String baseURL = "http://nft.skymeta.pro/pose_dance_api/v1_0";
-//    public static final String baseURL = "http://127.0.0.1:9081/pose_dance_api/v1_0";
+//    public static final String baseURL = "http://nft.skymeta.pro/pose_dance_api/v1_0";
+    public static final String baseURL = "http://127.0.0.1:9081/pose_dance_api/v1_0";
 
     public static String getMd5(byte[] data) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -168,6 +168,37 @@ public class Main {
         System.out.println(dataResponse.Data);
     }
 
+    public static void UpdateUserInfo() throws Exception {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost(baseURL + "/users/1/update");
+
+        String avatarFile = "/home/tamnb/Pictures/video-capture-5772.png";
+
+
+        File avatar = new File(avatarFile);
+        StringBody name = new StringBody("New Name", ContentType.TEXT_PLAIN);
+        HttpEntity reqEntity = MultipartEntityBuilder.create()
+                .addBinaryBody("avatar", avatar)
+                .addPart("name", name)
+                .build();
+        httppost.setEntity(reqEntity);
+
+        CloseableHttpResponse response = client.execute(httppost);
+        String json = CharStreams.toString(new InputStreamReader(response.getEntity().getContent()));
+        System.out.println(json);
+        client.close();
+        HttpResponse dataResponse = new Gson().fromJson(json, HttpResponse.class);
+        System.out.println(dataResponse.Code);
+        System.out.println(dataResponse.Msg);
+
+        dataResponse.Data = new UploadStatus();
+        JSONObject jsonObject = new JSONObject(json);
+        String dataString = jsonObject.getJSONObject("data").toString();
+        dataResponse.Data = new Gson().fromJson(dataString, dataResponse.Data.getClass());
+
+        System.out.println(dataResponse.Data);
+    }
+
 
     public static void signUpNewUserMultipart() throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
@@ -253,8 +284,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         System.out.println("Hello world!");
 //        signUpNewUserMultipart();
-        UploadMultipartFile();
+//        UploadMultipartFile();
         //SplittingFileAndUpload();
-
+        UpdateUserInfo();
     }
 }
