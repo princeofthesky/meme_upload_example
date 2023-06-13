@@ -34,8 +34,8 @@ import org.json.JSONObject;
 public class Main {
     Logger logger = LoggerFactory.getLogger(Main.class);
     public static final int ChunkSize = 512 * 1024;
-    public static final String baseURL = "http://nft.skymeta.pro/game_api";
-//    public static final String baseURL = "http://127.0.0.1:9090";
+    public static final String baseURL = "http://nft.skymeta.pro/pose_dance_api/v1_0";
+//    public static final String baseURL = "http://127.0.0.1:9081/pose_dance_api/v1_0";
 
     public static String getMd5(byte[] data) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -124,36 +124,31 @@ public class Main {
 
     public static void UploadMultipartFile() throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost(baseURL + "/videos/upload/multipart");
+        HttpPost httppost = new HttpPost(baseURL + "/match_results/upload/multipart");
 
         String coverFile = "/home/tamnb/Pictures/video-capture-5772.png";
-        String videoFile = "/home/tamnb/Projects/src/github.com/princeofthesky/upload_meme_video/ArFace-1673229411752.mp4";
+        String videoFile = "/home/tamnb/Pictures/download.mp4";
 
         File cover = new File(coverFile);
         File video = new File(videoFile);
 
-        StringBody title = new StringBody("Title 111111 ", ContentType.TEXT_PLAIN);
-        StringBody description = new StringBody("Description 111111 ", ContentType.TEXT_PLAIN);
-
-        StringBody hashTags = new StringBody(new Gson().toJson(new String[]{"hash tag 1 ", "hash tag 2", "hash tag 3"}), ContentType.TEXT_PLAIN);
-        StringBody topics = new StringBody(new Gson().toJson(new String[]{"topics 1", "topics 2", "topics 3"}), ContentType.TEXT_PLAIN);
+        StringBody playInfo = new StringBody("{\"a\":\"1111\"}", ContentType.TEXT_PLAIN);
+        StringBody playTime = new StringBody("1111111111", ContentType.TEXT_PLAIN);
 
         StringBody deviceId = new StringBody("111111AAAAAAAAA", ContentType.TEXT_PLAIN);
         StringBody score = new StringBody("88888", ContentType.TEXT_PLAIN);
         StringBody userId = new StringBody("1", ContentType.TEXT_PLAIN);
-        StringBody gameId = new StringBody("ban_ga", ContentType.TEXT_PLAIN);
+        StringBody audioId = new StringBody("7132058633684944897", ContentType.TEXT_PLAIN);
 
         HttpEntity reqEntity = MultipartEntityBuilder.create()
-                .addPart("title", title)
-                .addPart("description", description)
-                .addPart("hash_tags", hashTags)
-                .addPart("topics", topics)
+                .addPart("playInfo", playInfo)
+                .addPart("playTime", playTime)
                 .addBinaryBody("cover", cover)
                 .addBinaryBody("video", video)
                 .addPart("device_id", deviceId)
                 .addPart("score", score)
                 .addPart("user_id", userId)
-                .addPart("game_id", gameId)
+                .addPart("audio_id", audioId)
                 .build();
         httppost.setEntity(reqEntity);
 
