@@ -34,7 +34,7 @@ import org.json.JSONObject;
 public class Main {
     Logger logger = LoggerFactory.getLogger(Main.class);
     public static final int ChunkSize = 512 * 1024;
-//    public static final String baseURL = "http://nft.skymeta.pro/pose_dance_api/v1_0";
+    //    public static final String baseURL = "http://nft.skymeta.pro/pose_dance_api/v1_0";
     public static final String baseURL = "http://127.0.0.1:9081/pose_dance_api/v1_0";
 
     public static String getMd5(byte[] data) throws Exception {
@@ -168,6 +168,60 @@ public class Main {
         System.out.println(dataResponse.Data);
     }
 
+    public static void UploadVideoMatchResultMultipartFile(int matchId) throws Exception {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost(baseURL + "/match_results/" + matchId + "/upload/video");
+
+        String coverFile = "/home/tamnb/Pictures/video-capture-5772.png";
+        String videoFile = "/home/tamnb/Pictures/download.mp4";
+
+        File cover = new File(coverFile);
+        File video = new File(videoFile);
+
+        StringBody coverMd5 = new StringBody("b0a01fb717408553d6cd7eb863aaf0fe", ContentType.TEXT_PLAIN);
+        StringBody videoMd5 = new StringBody("9d05f81d28d5a69327b2196c4695ba37", ContentType.TEXT_PLAIN);
+
+        HttpEntity reqEntity = MultipartEntityBuilder.create()
+                .addPart("cover_md5", coverMd5)
+                .addPart("video_md5", videoMd5)
+                .addBinaryBody("cover", cover)
+                .addBinaryBody("video", video)
+                .build();
+        httppost.setEntity(reqEntity);
+
+        CloseableHttpResponse response = client.execute(httppost);
+        String json = CharStreams.toString(new InputStreamReader(response.getEntity().getContent()));
+        System.out.println(json);
+        client.close();
+        HttpResponse dataResponse = new Gson().fromJson(json, HttpResponse.class);
+        System.out.println(dataResponse.Code);
+        System.out.println(dataResponse.Msg);
+
+        dataResponse.Data = new UploadStatus();
+        JSONObject jsonObject = new JSONObject(json);
+        String dataString = jsonObject.getJSONObject("data").toString();
+        dataResponse.Data = new Gson().fromJson(dataString, dataResponse.Data.getClass());
+
+        System.out.println(dataResponse.Data);
+    }
+
+    public static void UploadMatchResultInfo() throws Exception {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(baseURL + "/match_results/upload/score");
+
+        StringEntity entity = new StringEntity("{\"user_id\":1,\"audio_id\":7132058633684944897,\"score\":111,\"play_info\":\"{\\\"a\\\":\\\"1\\\"}\",\"play_time\":22222,\"device_id\":\"aaaaaaaa\"}");
+        httpPost.setEntity(entity);
+
+
+        CloseableHttpResponse response = client.execute(httpPost);
+        String json = CharStreams.toString(new InputStreamReader(response.getEntity().getContent()));
+        System.out.println(json);
+        client.close();
+        HttpResponse dataResponse = new Gson().fromJson(json, HttpResponse.class);
+        System.out.println(dataResponse.Code);
+        System.out.println(dataResponse.Msg);
+    }
+
     public static void UpdateUserInfo() throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httppost = new HttpPost(baseURL + "/users/1/update");
@@ -286,6 +340,8 @@ public class Main {
 //        signUpNewUserMultipart();
 //        UploadMultipartFile();
         //SplittingFileAndUpload();
-        UpdateUserInfo();
+//        UpdateUserInfo();
+//        UploadMatchResultInfo();
+        UploadVideoMatchResultMultipartFile(1);
     }
 }
