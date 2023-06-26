@@ -209,7 +209,7 @@ public class Main {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(baseURL + "/match_results/upload/score");
 
-        StringEntity entity = new StringEntity("{\"user_id\":1,\"audio_id\":7132058633684944897,\"score\":111,\"play_info\":\"{\\\"a\\\":\\\"1\\\"}\",\"play_time\":22222,\"device_id\":\"aaaaaaaa\"}");
+        StringEntity entity = new StringEntity("{\"user_id\":1,\"audio_id\":7132058633684944897,\"score\":111,\"accuracy\":0,\"pose_execute_time\":0,\"video_md5\":\"9d05f81d28d5a69327b2196c4695ba37\",\"cover_md5\":\"b0a01fb717408553d6cd7eb863aaf0fe\",\"play_info\":\"{\\\"a\\\":\\\"1\\\"}\",\"play_time\":22222,\"device_id\":\"aaaaaaaa\"}");
         httpPost.setEntity(entity);
 
 
@@ -225,7 +225,6 @@ public class Main {
     public static void UpdateUserInfo() throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httppost = new HttpPost(baseURL + "/users/1/update");
-
         String avatarFile = "/home/tamnb/Pictures/video-capture-5772.png";
 
 
@@ -341,7 +340,7 @@ public class Main {
 //        UploadMultipartFile();
         //SplittingFileAndUpload();
 //        UpdateUserInfo();
-//        UploadMatchResultInfo();
-        UploadVideoMatchResultMultipartFile(1);
+        UploadMatchResultInfo();
+//        UploadVideoMatchResultMultipartFile(1);
     }
 }
